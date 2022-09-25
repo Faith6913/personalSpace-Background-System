@@ -12,15 +12,15 @@
         <h3 class="title">个人空间后台系统</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="loginId">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
+          ref="loginId"
+          v-model="loginForm.loginId"
           placeholder="请输入管理员账号"
-          name="username"
+          name="loginId"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -34,7 +34,7 @@
         <el-input
           :key="passwordType"
           ref="password"
-          v-model="loginForm.password"
+          v-model="loginForm.loginPwd"
           :type="passwordType"
           placeholder="请输入管理员密码"
           name="password"
@@ -44,7 +44,7 @@
         />
         <span class="show-pwd" @click="showPwd">
           <svg-icon
-            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
+            :icon-class="passwordType === 'loginPwd' ? 'eye' : 'eye-open'"
           />
         </span>
       </el-form-item>
@@ -113,17 +113,17 @@ export default {
     };
     return {
       loginForm: {
-        username: "",
-        password: "",
+        loginId: "admin",
+        loginPwd: "123123",
+        checked: false,
       },
       svg: "",
-      checked: false,
       loginRules: {
         // 这里书写各个字段的验证规则,通过prop属性关联起来的
-        username: [
+        loginId: [
           { required: true, trigger: "blur", validator: validateUsername },
         ],
-        password: [
+        loginPwd: [
           { required: true, trigger: "blur", validator: validatePassword },
         ],
         captcha: [
@@ -131,7 +131,7 @@ export default {
         ],
       },
       loading: false,
-      passwordType: "password",
+      passwordType: "loginPwd",
       redirect: undefined,
     };
   },
@@ -166,16 +166,28 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
+          if (this.loginForm.checked) {
+            this.loginForm.remember = 7;
+          }
           this.loading = true;
           this.$store
             .dispatch("user/login", this.loginForm)
-            .then(() => {
+            .then((res) => {
+              this.$message({
+                type: "success",
+                message: "登陆成功！",
+              });
               this.$router.push({ path: this.redirect || "/" });
+              // this.$router.push("/");
               this.loading = false;
             })
-            .catch(() => {
+            .catch((res) => {
+              this.$message.error(`${res}`);
+              this.getCaptchaFunc();
               this.loading = false;
             });
+
+          // console.log(valid, this.loginForm);
         } else {
           console.log("错误提交了");
           return false;
