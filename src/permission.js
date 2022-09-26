@@ -12,8 +12,6 @@ NProgress.configure({ showSpinner: true }); // NProgress Configuration
 // const whiteList = ["/login"]; // no redirect whitelist
 
 router.beforeEach(async (to, from, next) => {
-  const hasToken = getToken();
-  // start progress bar
   NProgress.start();
 
   // set page title
@@ -21,45 +19,54 @@ router.beforeEach(async (to, from, next) => {
 
   const hasGetUserInfo = store.getters.user;
   if (to.meta.auth) {
-    next();
-    NProgress.done();
     // 这里要进的路由时需要鉴权的
-    // if (hasGetUserInfo) {
-    //   // localStorage里有adminToken, 需要检验是否有userInfo
-    //   setTimeout(() => {
-    //     next();
-    //     NProgress.done();
-    //   }, 3000);
-    // } else {
-    //   // localStorage里没有adminToken,需要进入登录页重新登录以获取token
-    //   next(`/login?redirect=${to.path}`);
-    //   NProgress.done();
-    // }
+    if (hasGetUserInfo) {
+      // vuex 里有用户信息，直接放行
+      // setTimeout(() => {
+      //   next();
+      //   NProgress.done();
+      // }, 600);
+      console.log("进入正常页面");
+    } else {
+      // vuex 里没有user,需要先登录
+      const hasToken = localStorage.getItem("adminToken");
+      if (hasToken) {
+        try {
+          await store.dispatch("user/getInfo", hasToken);
+          next();
+        } catch (error) {
+          await store.dispatch("user/resetToken", hasToken);
+          Message.error("登陆过期,请重新登录");
+          next(`/login?redirect=${to.path}`);
+        }
+      } else {
+        alert("请先登录!");
+        next(`/login?redirect=${to.path}`);
+      }
+    }
+    NProgress.done();
   } else {
     // 该页面不需要鉴权
 
     // 需要先判断一下是否进的是login页面
     if (to.path === "/login") {
       // 如果是的话，需要看是否已经登陆，已登录则导航到首页，未登录则放行进入登录页面
-      if (hasGetUserInfo.name) {
-        next();
-        NProgress.done();
+      if (hasGetUserInfo) {
+        next({ path: "/" });
       } else {
+        const hasToken = localStorage.getItem("adminToken");
         if (hasToken) {
-          console.log("需要恢复一下登录状态");
           await store.dispatch("user/getInfo", hasToken);
           next({ path: "/" });
-          NProgress.done();
         } else {
           next();
-          NProgress.done();
         }
       }
     } else {
       // 如果进的不是登录页面，直接放行
       next();
-      NProgress.done();
     }
+    NProgress.done();
   }
 
   // 下方是vue-element-admin原来的鉴权流程

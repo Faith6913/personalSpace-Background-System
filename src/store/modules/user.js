@@ -6,7 +6,6 @@ const getDefaultState = () => {
     token: getToken(),
     name: "",
     avatar: "",
-    user: null,
   };
 };
 
@@ -34,8 +33,6 @@ const actions = {
   // user login
   login({ commit }, userInfo) {
     // userInfo 是用户提交的数据，接下来就需要将userInfo发送到服务器
-    // console.log(userInfo);
-
     return new Promise((resolve, reject) => {
       loginAPI(userInfo)
         .then((resp) => {
@@ -44,6 +41,7 @@ const actions = {
             if (data !== null) {
               // code 为 0 并且data 不是null, 登陆成功
               commit("SET_USER", data);
+              // commit("SET_NAME", data.name);
               commit("SET_TOKEN", localStorage.getItem("adminToken"));
               resolve(data);
             } else {
@@ -63,16 +61,13 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfoAPI(state.token)
+      getInfoAPI()
         .then((response) => {
           const { data } = response;
-          console.log(response);
           if (!data) {
             return reject("Verification failed, please Login again.");
           }
-
           commit("SET_USER", data);
-          // commit("SET_AVATAR", avatar);
           resolve(data);
         })
         .catch((error) => {

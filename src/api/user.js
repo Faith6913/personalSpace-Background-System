@@ -8,12 +8,10 @@ export function loginAPI(data) {
   });
 }
 
-export function getInfoAPI(token) {
-  console.log(token);
+export function getInfoAPI() {
   return request({
     url: "/api/admin/whoami",
     method: "get",
-    headers: { Authorization: `Bearer ${token}` },
   });
 }
 

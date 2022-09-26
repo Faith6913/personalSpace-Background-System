@@ -113,8 +113,8 @@ export default {
     };
     return {
       loginForm: {
-        loginId: "admin",
-        loginPwd: "123123",
+        loginId: "",
+        loginPwd: "",
         checked: false,
       },
       svg: "",
