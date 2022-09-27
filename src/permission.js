@@ -22,11 +22,9 @@ router.beforeEach(async (to, from, next) => {
     // 这里要进的路由时需要鉴权的
     if (hasGetUserInfo) {
       // vuex 里有用户信息，直接放行
-      // setTimeout(() => {
-      //   next();
-      //   NProgress.done();
-      // }, 600);
-      console.log("进入正常页面");
+      setTimeout(() => {
+        next();
+      }, 600);
     } else {
       // vuex 里没有user,需要先登录
       const hasToken = localStorage.getItem("adminToken");

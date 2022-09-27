@@ -1,4 +1,4 @@
-import { loginAPI, logout, getInfoAPI } from "@/api/user";
+import { loginAPI, getInfoAPI } from "@/api/user";
 import { getToken, setToken, removeToken } from "@/utils/auth";
 import { resetRouter } from "@/router";
 const getDefaultState = () => {
@@ -76,23 +76,17 @@ const actions = {
     });
   },
 
-  // user logout
+  // 用户退出登录
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
-      logout(state.token)
-        .then(() => {
-          removeToken(); // must remove  token  first
-          resetRouter();
-          commit("RESET_STATE");
-          resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
+      removeToken(); // must remove  token  first
+      resetRouter();
+      commit("RESET_STATE");
+      resolve();
     });
   },
 
-  // remove token
+  // 删除token
   resetToken({ commit }) {
     return new Promise((resolve) => {
       removeToken(); // must remove  token  first
