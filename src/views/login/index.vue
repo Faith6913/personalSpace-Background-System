@@ -85,21 +85,24 @@
 </template>
 
 <script>
-import { validUsername } from "@/utils/validate";
 import { getCaptcha } from "@/api/captcha";
 export default {
   name: "Login",
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (!value) {
         callback(new Error("请输入管理员账号"));
+      } else if (value !== "admin" && value !== "editor") {
+        callback(new Error("暂无此管理员"));
       } else {
         callback();
       }
     };
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
+      if (value.length < 6 && value.length > 0) {
         callback(new Error("密码不能少于六位数"));
+      } else if (value.length === 0) {
+        callback(new Error("请输入密码"));
       } else {
         callback();
       }
