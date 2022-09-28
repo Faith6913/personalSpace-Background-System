@@ -62,7 +62,7 @@
     </div>
 
     <!-- 编辑首页标语 -->
-    <el-dialog title="请编辑信息" :visible.sync="dialogFormVisible">
+    <el-dialog title="请编辑信息" :visible.sync="dialogFormVisible" top="50px">
       <el-form :model="form">
         <el-form-item label="标题">
           <el-input v-model="form.title" autocomplete="off"></el-input>
@@ -76,7 +76,21 @@
           >
           </el-input>
         </el-form-item>
-        <Upload uploadTitle="中图片" />
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="首页中图">
+              <Upload
+                uploadTitle=""
+                v-model="form.midImg"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="首页大图">
+              <Upload uploadTitle="" v-model="form.bigImg" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>

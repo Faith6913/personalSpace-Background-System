@@ -1,7 +1,7 @@
 <template>
-  <div class="upload-container">
+  <div  class="upload-container">
     <!-- 上传组件标题 -->
-    <div>{{ uploadTitle }}</div>
+    <div class="block">{{ uploadTitle }}</div>
     <!-- 上传组件 -->
     <el-upload
       class="avatar-uploader"
@@ -10,23 +10,24 @@
       :on-success="handleAvatarSuccess"
       :before-upload="beforeAvatarUpload"
     >
-      <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+      <img v-if="value" :src="imageUrl" class="avatar" />
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
   </div>
 </template>
 
 <script>
+import { SERVE_URL } from "@/urlConfig.js";
 export default {
   props: ["uploadTitle", "value"],
-  data() {
-    return {
-      imageUrl: "",
-    };
+  computed: {
+    imageUrl() {
+      return SERVE_URL + this.value;
+    },
   },
   methods: {
     handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
+      // this.imageUrl = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
@@ -45,6 +46,10 @@ export default {
 </script>
 
 <style>
+.block {
+  margin: 15px 0;
+  font-weight: 100;
+}
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
@@ -65,7 +70,7 @@ export default {
 }
 .avatar {
   width: 178px;
-  height: 178px;
   display: block;
+  margin: 0 auto;
 }
 </style>
