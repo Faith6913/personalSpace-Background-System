@@ -79,10 +79,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="首页中图">
-              <Upload
-                uploadTitle=""
-                v-model="form.midImg"
-              />
+              <Upload uploadTitle="" v-model="form.midImg" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -94,16 +91,14 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="editBannerConfirm">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getBanner } from "@/api/banner.js";
+import { getBanner, setBanner } from "@/api/banner.js";
 import { SERVE_URL } from "@/urlConfig.js";
 import Upload from "@/components/Upload";
 export default {
@@ -138,6 +133,27 @@ export default {
     editBannerHandle(bannerInfo) {
       this.form = { ...bannerInfo };
       this.dialogFormVisible = true;
+    },
+    editBannerConfirm() {
+      // 从表单里面拿到用户修改的数据，发送给服务器
+      // 因为api文档要求三个首页标语都要上传，哪怕只改了其中一个
+      this.data = this.data.map((bannerInfo) => {
+        if (this.form.id === bannerInfo.id) {
+          return {
+            ...this.form,
+          };
+        }
+        return {
+          ...bannerInfo,
+        };
+      });
+      setBanner(this.data).then((resp) => {
+        this.dialogFormVisible = false;
+        this.$message({
+          type: "success",
+          message: "修改标语成功"
+        });
+      });
     },
   },
 };

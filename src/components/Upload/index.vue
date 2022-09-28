@@ -1,14 +1,15 @@
 <template>
-  <div  class="upload-container">
+  <div class="upload-container">
     <!-- 上传组件标题 -->
     <div class="block">{{ uploadTitle }}</div>
     <!-- 上传组件 -->
     <el-upload
       class="avatar-uploader"
-      action="https://jsonplaceholder.typicode.com/posts/"
+      action="/api/upload"
       :show-file-list="false"
       :on-success="handleAvatarSuccess"
       :before-upload="beforeAvatarUpload"
+      :headers="headers"
     >
       <img v-if="value" :src="imageUrl" class="avatar" />
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -22,14 +23,25 @@ export default {
   props: ["uploadTitle", "value"],
   computed: {
     imageUrl() {
-      return SERVE_URL + this.value;
+      if (this.value) {
+        return SERVE_URL + this.value;
+      }
+    },
+    headers() {
+      return {
+        Authorization: "Bearer " + localStorage.getItem("adminToken"),
+      };
     },
   },
   methods: {
-    handleAvatarSuccess(res, file) {
-      // this.imageUrl = URL.createObjectURL(file.raw);
+    handleAvatarSuccess(res, file, fileList) {
+      if (!res.code && res.data) {
+        // 说明上传成功，服务器给我们返回了图片上传后的服务器地址
+        this.$emit("input", res.data);
+      }
     },
     beforeAvatarUpload(file) {
+      console.log("上传之前进行的操作");
       const isJPG = file.type === "image/jpeg";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
