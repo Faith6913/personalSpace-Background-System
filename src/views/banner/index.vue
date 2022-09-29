@@ -27,7 +27,7 @@
           <template slot-scope="scope">
             <el-image
               style="width: 100px"
-              :src="`${BASE_URL}${scope.row.bigImg}`"
+              :src="`${BASE_URL}${scope.row.midImg}`"
             ></el-image>
           </template>
         </el-table-column>
@@ -56,9 +56,41 @@
                 @click="editBannerHandle(scope.row)"
               ></el-button>
             </el-tooltip>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="删除"
+              placement="top"
+              :hide-after="1000"
+            >
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+                circle
+                @click="deleteBannerHandle(scope.row)"
+              ></el-button>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
+      <div class="add-container">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="添加标语"
+          placement="top"
+          :hide-after="1000"
+        >
+          <el-button
+            type="primary"
+            icon="el-icon-plus"
+            size="medium"
+            circle
+            @click="addBannerHandle"
+          ></el-button>
+        </el-tooltip>
+      </div>
     </div>
 
     <!-- 编辑首页标语 -->
@@ -110,6 +142,7 @@ export default {
       data: [],
       BASE_URL: SERVE_URL,
       dialogFormVisible: false,
+      // 这个form属性是编辑或者新建标语时的内容
       form: {
         id: "",
         midImg: "",
@@ -134,24 +167,69 @@ export default {
       this.form = { ...bannerInfo };
       this.dialogFormVisible = true;
     },
+    // 修改确认按钮的处理方法
     editBannerConfirm() {
-      // 从表单里面拿到用户修改的数据，发送给服务器
-      // 因为api文档要求三个首页标语都要上传，哪怕只改了其中一个
-      this.data = this.data.map((bannerInfo) => {
-        if (this.form.id === bannerInfo.id) {
+      if (this.form.id === "") {
+        console.log("这里是添加一条标语的操作");
+        this.form.id = String(Math.random());
+        this.data.push(this.form);
+        setBanner(this.data).then((resp) => {
+          this.dialogFormVisible = false;
+          this.$message({
+            type: "success",
+            message: "已成功添加标语",
+          });
+        });
+      } else {
+        console.log("这里是编辑修改标语的操作");
+        // 从表单里面拿到用户修改的数据，发送给服务器
+        // 因为api文档要求三个首页标语都要上传，哪怕只改了其中一个
+        this.data = this.data.map((bannerInfo) => {
+          if (this.form.id === bannerInfo.id) {
+            return {
+              ...this.form,
+            };
+          }
           return {
-            ...this.form,
+            ...bannerInfo,
           };
-        }
-        return {
-          ...bannerInfo,
-        };
+        });
+        setBanner(this.data).then((resp) => {
+          this.dialogFormVisible = false;
+          this.$message({
+            type: "success",
+            message: "已成功修改标语",
+          });
+        });
+      }
+    },
+    // 添加一条标语的方法
+    addBannerHandle() {
+      console.log("添加一条标语");
+      this.form = {
+        id: "",
+        midImg: "",
+        bigImg: "",
+        title: "",
+        description: "",
+      };
+      // const test = this.data[0];
+      this.dialogFormVisible = true;
+      // this.data.push(test);
+    },
+    // 删除一条标语的方法
+    deleteBannerHandle(bannerInfo) {
+      this.form = {
+        ...bannerInfo,
+      };
+      this.data = this.data.filter((banner) => {
+        return banner.id !== this.form.id;
       });
+      // 调用接口传给服务器，否则删了白删
       setBanner(this.data).then((resp) => {
-        this.dialogFormVisible = false;
         this.$message({
           type: "success",
-          message: "修改标语成功"
+          message: "删除标语成功",
         });
       });
     },
@@ -159,4 +237,11 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.add-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+</style>
