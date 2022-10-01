@@ -11,6 +11,7 @@ export function getBlog(page = 1, limit = 5) {
   });
 }
 
+// 删除博客
 export function deleteBlog(blogId){
   return request({
     url: `/api/blog/${blogId}`,
