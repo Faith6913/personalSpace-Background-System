@@ -11,11 +11,9 @@ export function getBlog(page = 1, limit = 5) {
   });
 }
 
-// 设置首页标语
-// export function setBanner(data) {
-//   return request({
-//     url: "/api/banner",
-//     method: "post",
-//     data,
-//   });
-// }
+export function deleteBlog(blogId){
+  return request({
+    url: `/api/blog/${blogId}`,
+    method: "delete",
+  });
+}

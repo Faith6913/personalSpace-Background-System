@@ -12,19 +12,49 @@
 
         <el-table-column
           prop="title"
-          label="文章名称"
-          width="150"
+          label="博客名称"
+          width="200"
           align="center"
         >
           <template slot-scope="scope">
-            <span style="margin-left: 10px">{{ scope.row.title }}</span>
+            <el-popover
+              placement="top-start"
+              title="博客预览图"
+              width="200"
+              trigger="hover"
+              v-if="scope.row.thumb"
+            >
+              <el-image
+                style="width: 100px; height: 100px"
+                fit="contain"
+                :src="scope.row.thumb"
+                :preview-src-list="srcList"
+              ></el-image>
+              <a
+                href="#"
+                target="_blank"
+                style="margin-left: 10px"
+                slot="reference"
+                @click.prevent="handleOpenTitle(scope.row)"
+                >{{ scope.row.title }}</a
+              >
+            </el-popover>
+            <a
+              href="#"
+              target="_blank"
+              style="margin-left: 10px"
+              slot="reference"
+              @click.prevent="handleOpenTitle(scope.row)"
+              v-if="!scope.row.thumb"
+              >{{ scope.row.title }}</a
+            >
           </template>
         </el-table-column>
 
         <el-table-column
           prop="description"
-          label="文章描述"
-          width="400"
+          label="博客描述"
+          width="360"
           align="center"
         >
           <template slot-scope="scope">
@@ -70,7 +100,7 @@
         <el-table-column
           prop="createDate"
           label="创建日期"
-          width="170"
+          width="165"
           align="center"
         >
           <template slot-scope="scope">
@@ -80,7 +110,7 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
-          <template slot-scope="">
+          <template slot-scope="scope">
             <el-tooltip
               class="item"
               effect="dark"
@@ -93,7 +123,6 @@
                 icon="el-icon-edit"
                 size="mini"
                 circle
-                @click="handleDeleteBlog(scope.row)"
               ></el-button>
             </el-tooltip>
             <el-tooltip
@@ -103,12 +132,14 @@
               placement="top"
               :hide-after="1000"
             >
-              <el-button
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-                circle
-              ></el-button>
+              <el-button type="text" @click="handleDeleteBlog(scope.row)">
+                <el-button
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                  circle
+                ></el-button>
+              </el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -132,8 +163,9 @@
 </template>
 
 <script>
-import { getBlog } from "@/api/blog";
+import { getBlog, deleteBlog } from "@/api/blog";
 import { parseTime } from "@/utils";
+import { SERVE_URL, FRONTED_END_URL } from "@/urlConfig.js";
 export default {
   data() {
     return {
@@ -141,6 +173,8 @@ export default {
       total: 0,
       limit: 5,
       currentPage: 1,
+      totalPage: 0,
+      srcList: [],
     };
   },
   created() {
@@ -148,9 +182,24 @@ export default {
   },
   methods: {
     fetchData() {
-      getBlog(this.currentPage, this.limit).then((resp) => {
-        this.blogs = resp.data.rows;
-        this.total = resp.data.total;
+      getBlog(this.currentPage, this.limit).then(({ data }) => {
+        this.blogs = data.rows;
+        for (let i of this.blogs) {
+          if (i.thumb) {
+            i.thumb = SERVE_URL + i.thumb;
+          } else {
+            i.thumb = "";
+          }
+          this.srcList.push(i.thumb);
+        }
+        this.total = data.total;
+        this.totalPage = Math.ceil(this.total / this.limit);
+        // 下面的if判断会在删除博客的时候可能会触发，比如最后一页只有一条数据
+        // 删除之后，总页码数就会减一，当前页码就大于了总页码，所以要进行处理
+        if (this.currentPage > this.totalPage) {
+          this.currentPage = this.totalPage;
+          this.fetchData();
+        }
       });
     },
     parseCreatedDate(creatDate) {
@@ -164,14 +213,39 @@ export default {
       this.currentPage = val;
       this.fetchData();
     },
-    prevClickHandle(val) {
+    prevClickHandle() {
       this.currentPage--;
     },
-    nextClickHandle(val) {
+    nextClickHandle() {
       this.currentPage++;
     },
     handleDeleteBlog(blogInfo) {
-      console.log(blogInfo);
+      this.$confirm(
+        "删除该博客会将该博客下面的评论一并删除, 是否继续?",
+        "是否删除此博客",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(async () => {
+          await deleteBlog(blogInfo.id);
+          this.fetchData();
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    handleOpenTitle(blogInfo) {
+      window.open(`${FRONTED_END_URL}/blog/${blogInfo.id}`);
     },
   },
 };
