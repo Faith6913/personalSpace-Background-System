@@ -123,6 +123,7 @@
                 icon="el-icon-edit"
                 size="mini"
                 circle
+                @click="handleEditBlog(scope.row)"
               ></el-button>
             </el-tooltip>
             <el-tooltip
@@ -219,6 +220,7 @@ export default {
     nextClickHandle() {
       this.currentPage++;
     },
+    // 删除博客
     handleDeleteBlog(blogInfo) {
       this.$confirm(
         "删除该博客会将该博客下面的评论一并删除, 是否继续?",
@@ -244,8 +246,13 @@ export default {
           });
         });
     },
+    // 打开前端文章页面
     handleOpenTitle(blogInfo) {
       window.open(`${FRONTED_END_URL}/blog/${blogInfo.id}`);
+    },
+    // 编辑博客
+    handleEditBlog(blogInfo) {
+      this.$router.push(`/blogEdit/${blogInfo.id}`)
     },
   },
 };

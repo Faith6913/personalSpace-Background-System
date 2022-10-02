@@ -1,5 +1,5 @@
 <template>
-  <div class="blog-add-container">
+  <div class="edit-blog-container">
     <div class="app-container">
       <!-- 博客标题 -->
       <div class="blog-title">博客标题</div>
@@ -11,7 +11,11 @@
 
       <!-- 博客编辑 -->
       <div class="blog-title">博客编辑</div>
-      <editor height="600px" ref="toastuiEditor" />
+      <editor
+        height="600px"
+        ref="toastuiEditor"
+        v-model="form.markdownContent"
+      />
 
       <!-- 博客描述 -->
       <div class="blog-title">博客描述</div>
@@ -28,7 +32,11 @@
 
       <!-- 选择分类 -->
       <div class="blog-title">选择博客分类</div>
-      <el-select v-model="form.categoryId" placeholder="请选择博客分类">
+      <el-select
+        v-model="form.categoryId"
+        placeholder="请选择博客分类"
+        @change="changeHandle"
+      >
         <el-option
           v-for="item in blogType"
           :key="item.id"
@@ -40,8 +48,9 @@
 
       <!-- 发布博客 -->
       <div class="btn-container">
-        <el-button type="primary" @click="handleAddBlog">{{
-          publishing ? "发布中..." : "发布博客"
+        <el-button @click="handleConsellModifyBlog">取消修改</el-button>
+        <el-button type="primary" @click="handleModifyBlog">{{
+          publishing ? "发布中..." : "确认修改"
         }}</el-button>
       </div>
     </div>
@@ -49,11 +58,11 @@
 </template>
 
 <script>
+import { getOneBlog, editBlog } from "@/api/blog";
 import "@toast-ui/editor/dist/toastui-editor.css";
 import Upload from "@/components/Upload";
 import { Editor } from "@toast-ui/vue-editor";
 import { getBlogType } from "@/api/blogType.js";
-import { postBlog } from "@/api/blog";
 export default {
   data() {
     return {
@@ -62,12 +71,16 @@ export default {
         description: "", // 博客描述
         htmlContent: "", // 用户编辑的内容
         thumb: "",
-        categoryId: "",
+        category: {
+          id: "",
+        },
         toc: [], // 后续服务器会根据markdown的内容生成toc目录
         markdownContent: "",
+        selected: "",
       },
       blogType: [],
       publishing: false,
+      blogId: "",
     };
   },
   components: {
@@ -76,33 +89,44 @@ export default {
   },
   methods: {
     fetchData() {
+      this.blogId = this.$route.params.id;
       getBlogType().then(({ data }) => {
         this.blogType = data;
       });
+      getOneBlog(this.blogId).then(({ data }) => {
+        // 接下来将获取的博客回填到表格里
+        this.form = data;
+        this.form.selected = data.category === null ? "" : data.category.name;
+        this.form.categoryId = data.category === null ? "" : data.category.id
+        this.$refs.toastuiEditor.invoke("setHTML", data.htmlContent);
+      });
     },
-    handleAddBlog() {
+    handleModifyBlog() {
       let html = this.$refs.toastuiEditor.invoke("getHTML");
       let markDown = this.$refs.toastuiEditor.invoke("getMarkdown");
       this.form.htmlContent = html;
       this.form.markdownContent = markDown;
       this.publishing = true;
-
       const obj = {
         title: this.form.title,
         description: this.form.description,
-        createDate: new Date().getTime(),
         categoryId: this.form.categoryId,
+        toc: this.form.toc,
+        createDate: new Date().getTime(),
         htmlContent: this.form.htmlContent,
         thumb: this.form.thumb,
         markdownContent: this.form.markdownContent,
       };
-      console.log("添加文章的时候", obj);
+      console.log(obj);
       if (obj.title && obj.description && obj.categoryId) {
-        postBlog(obj).then(() => {
+        editBlog({
+          id: this.blogId,
+          data: obj,
+        }).then(() => {
           this.publishing = false;
           this.$message({
             type: "success",
-            message: "发布博客成功",
+            message: "修改博客成功",
           });
           this.$router.push("/blogList");
         });
@@ -111,8 +135,14 @@ export default {
         this.publishing = false;
       }
     },
+    handleConsellModifyBlog() {
+      console.log("取消修改博客");
+    },
+    // 强制更新一下，element-ui内部数据和ui没有同步，导致编辑页面的下拉菜单没办法选择，这里强制更新一下
+    changeHandle() {
+      this.$forceUpdate();
+    },
   },
-
   created() {
     this.fetchData();
   },
@@ -120,7 +150,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.blog-add-container {
+.edit-blog-container {
   margin-bottom: 50px;
   .app-container {
     .blog-title {
