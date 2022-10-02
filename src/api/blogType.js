@@ -19,23 +19,35 @@ export function getBlogType() {
  */
 export function deleteBlogType(blogTypeId) {
   return request({
-    url: `/api/blog/${blogTypeId}`,
+    url: `/api/blogtype/${blogTypeId}`,
     method: "delete",
   });
 }
 
 /**
  * 添加博客分类
- * @returns {Promise}
+ * @param {Object} data
+ * @returns
  */
-export function addBlogType(typeName, typeOrder) {
+export function addBlogType(data) {
   return request({
     url: "/api/blogtype",
     method: "post",
-    data: {
-      name: typeName,
-      order: typeOrder,
-    },
+    data,
+  });
+}
+
+/**
+ * 修改文章分类
+ * @param {String} blogTypeId 
+ * @param {Object} data 
+ * @returns 
+ */
+export function modifyBlogType(blogTypeId, data) {
+  return request({
+    url: `/api/blogtype/${blogTypeId}`,
+    method: "put",
+    data,
   });
 }
 
@@ -44,9 +56,9 @@ export function addBlogType(typeName, typeOrder) {
  * @param {String} blogTypeId 要删除的分类id
  * @returns {Promise}
  */
- export function getOneBlogType(blogTypeId) {
-    return request({
-      url: `/api/blog/${blogTypeId}`,
-      method: "get",
-    });
-  }
+export function getOneBlogType(blogTypeId) {
+  return request({
+    url: `/api/blogtype/${blogTypeId}`,
+    method: "get",
+  });
+}

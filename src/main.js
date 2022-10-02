@@ -6,7 +6,7 @@ import "normalize.css/normalize.css"; // A modern alternative to CSS resets
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 // import locale from "element-ui/lib/locale/lang/en"; // lang i18n
-import zhLocale from 'element-ui/lib/locale/lang/zh-CN'  //引入中文版
+import zhLocale from "element-ui/lib/locale/lang/zh-CN"; //引入中文版
 
 import "@/styles/index.scss"; // global css
 
@@ -43,3 +43,11 @@ new Vue({
   store,
   render: (h) => h(App),
 });
+
+// 测试博客分类接口
+import { getBlogType, addBlogType } from "@/api/blogType";
+
+getBlogType().then((resp) => {
+  console.log(resp);
+});
+
