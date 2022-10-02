@@ -11,7 +11,7 @@
 
       <!-- 博客编辑 -->
       <div class="blog-title">博客编辑</div>
-      <editor height="600px" ref="toastuiEditor" />
+      <editor height="600px" ref="toastuiEditor" :options="editorOptions" />
 
       <!-- 博客描述 -->
       <div class="blog-title">博客描述</div>
@@ -28,7 +28,11 @@
 
       <!-- 选择分类 -->
       <div class="blog-title">选择博客分类</div>
-      <el-select v-model="form.categoryId" placeholder="请选择博客分类">
+      <el-select
+        v-model="form.categoryId"
+        placeholder="请选择博客分类"
+        @change="changeHandle"
+      >
         <el-option
           v-for="item in blogType"
           :key="item.id"
@@ -53,11 +57,12 @@
 
 <script>
 import "@toast-ui/editor/dist/toastui-editor.css";
-import Upload from "@/components/Upload";
 import { Editor } from "@toast-ui/vue-editor";
+import Upload from "@/components/Upload";
 import { getBlogType } from "@/api/blogType.js";
 import { getOneBlog, editBlog } from "@/api/blog";
 import { postBlog } from "@/api/blog";
+import "@toast-ui/editor/dist/i18n/zh-cn";
 export default {
   props: ["mode"],
   data() {
@@ -75,6 +80,9 @@ export default {
       publishing: false,
       blogId: "",
       btnContent: "发布文章",
+      editorOptions: {
+        language: "zh-cn",
+      },
     };
   },
   components: {
