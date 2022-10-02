@@ -45,9 +45,9 @@ new Vue({
 });
 
 // 测试博客分类接口
-import { getBlogType, addBlogType } from "@/api/blogType";
+// import { getBlogType, addBlogType } from "@/api/blogType";
 
-getBlogType().then((resp) => {
-  console.log(resp);
-});
+// getBlogType().then((resp) => {
+//   console.log(resp);
+// });
 
