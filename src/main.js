@@ -16,7 +16,7 @@ import router from "./router";
 
 import "@/icons"; // icon
 import "@/permission"; // permission control
-
+import "@/assets/icons/aliyun.css";
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -51,3 +51,42 @@ new Vue({
 //   console.log(resp);
 // });
 
+// 测试一下项目接口
+import {
+  getProjects,
+  addProject,
+  deleteProject,
+  modifyProject,
+} from "./api/projects";
+// addProject({
+//   description: ["知识点: aaaa", "sdsadas"],
+//   name: "测试项目接口的项目",
+//   url: "http://www.demo.com/test",
+//   github: "https://github.com/DuYi-Edu/test",
+//   thumb: "https://avatars.githubusercontent.com/u/123123",
+//   order: 2,
+// }).then(({ data }) => {
+//   console.log("添加项目：", data);
+//   getProjects().then(({ data }) => {
+//     console.log("全部项目：", data);
+//   });
+// });
+// deleteProject("633ac423fbe74a27e007e98b").then(({ data }) => {
+//   console.log("删除项目：", data);
+//   getProjects().then(({ data }) => {
+//     console.log("全部项目：", data);
+//   });
+// });
+// modifyProject("633ac46ffbe74a27e007e994", {
+//   description: ["知识点: aaaa", "sdsadas"],
+//   name: "测试项目修改项目接口2222",
+//   url: "http://www.demo.com/test",
+//   github: "https://gasdasdi-Edu/test",
+//   thumb: "httpsfsasas.githubusercontent.com/u/123123",
+//   order: 2,
+// }).then(({ data }) => {
+//   console.log("修改项目:", data);
+//   getProjects().then(({ data }) => {
+//     console.log("全部项目：", data);
+//   });
+// });
