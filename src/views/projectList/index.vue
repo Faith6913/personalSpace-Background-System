@@ -32,6 +32,16 @@
             <span style="margin-left: 10px">{{ scope.row.description }}</span>
           </template>
         </el-table-column>
+        <el-table-column
+          prop="order"
+          label="排序等级"
+          width="100"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <span style="margin-left: 10px">{{ scope.row.order }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="bigImg" label="操作" align="center">
           <template slot-scope="scope">
             <el-tooltip
@@ -228,20 +238,31 @@ export default {
         }
       });
     },
-    editProjectConfirm() {
-      const obj = {
+    async editProjectConfirm() {
+      let obj = {
         ...this.form,
         description: [this.form.description],
       };
       if (!this.form.id) {
         // 这里是添加项目
-        addProject(obj).then(() => {
-          this.fetchData();
-          this.dialogFormVisible = false;
-          this.$message({
-            type: "success",
-            message: "添加项目成功!",
-          });
+        addProject(obj).then((resp) => {
+          let res = resp;
+          if (typeof resp == "string") {
+            res = JSON.parse(resp);
+          }
+          if (res.code) {
+            this.$message({
+              type: "error",
+              message: "请填写完整内容~",
+            });
+          } else {
+            this.fetchData();
+            this.dialogFormVisible = false;
+            this.$message({
+              type: "success",
+              message: "项目添加成功!",
+            });
+          }
         });
       } else {
         // 这里是编辑修改项目
