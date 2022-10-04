@@ -42,9 +42,9 @@
               :hide-after="1000"
             >
               <el-button
-                type="primary"
-                class="iconfont icon-github-fill"
-                size="small"
+                type=""
+                class="iconfont icon-github githubIcon"
+                size="mini"
                 circle
                 @click="handleToGithub(scope.row.github)"
               ></el-button>
@@ -59,7 +59,7 @@
               <el-button
                 type="primary"
                 icon="el-icon-edit"
-                size="medium"
+                size="mini"
                 circle
                 @click="handleModifyOneProject(scope.row.id)"
               ></el-button>
@@ -74,7 +74,7 @@
               <el-button
                 type="danger"
                 icon="el-icon-delete"
-                size="medium"
+                size="mini"
                 circle
                 @click="handleDeleteOneProject(scope.row.id)"
               ></el-button>
@@ -94,7 +94,7 @@
           <el-button
             type="primary"
             icon="el-icon-plus"
-            size="medium"
+            size="mini"
             circle
             @click="handleAddProject"
           ></el-button>
@@ -117,6 +117,31 @@
           >
           </el-input>
         </el-form-item>
+
+        <el-form-item label="Demo地址">
+          <el-input v-model="form.url" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="github地址">
+          <el-input v-model="form.github" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="预览图">
+          <Upload uploadTitle="" v-model="form.thumb" />
+        </el-form-item>
+        <el-form-item label="排序等级">
+          <el-select
+            v-model="form.order"
+            placeholder="请选择排序等级"
+            autocomplete="off"
+          >
+            <el-option
+              v-for="item in orderList"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -133,7 +158,11 @@ import {
   deleteProject,
   modifyProject,
 } from "@/api/projects";
+import Upload from "@/components/Upload";
 export default {
+  components: {
+    Upload,
+  },
   data() {
     return {
       data: [],
@@ -143,9 +172,10 @@ export default {
         url: "",
         github: "",
         thumb: "",
-        order: 0,
+        order: 1,
       },
       dialogFormVisible: false,
+      orderList: new Array(20).fill(0).map((item, index) => index),
     };
   },
   methods: {
@@ -161,23 +191,73 @@ export default {
       });
     },
     handleToProjectAdress(projectAdress) {
-      console.log(`连接到该项目的地址${projectAdress}`);
+      // console.log(`连接到该项目的地址${projectAdress}`);
+      window.open(projectAdress, "_blank");
     },
     handleAddProject() {
-      console.log("添加一条项目");
       this.dialogFormVisible = true;
     },
     handleDeleteOneProject(projectId) {
       console.log(`删除id为${projectId}的项目`);
+      this.$confirm("确定要删除此项目吗?", "删除项目", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          await deleteProject(projectId);
+          this.fetchData();
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
     handleModifyOneProject(projectId) {
-      console.log(`修改一下id为${projectId}的项目`);
+      // console.log(`修改一下id为${projectId}的项目`);
+      this.dialogFormVisible = true;
+      this.data.forEach((item) => {
+        if (item.id === projectId) {
+          this.form = item;
+        }
+      });
     },
     editProjectConfirm() {
-      console.log("确认修改项目内容");
+      const obj = {
+        ...this.form,
+        description: [this.form.description],
+      };
+      if (!this.form.id) {
+        // 这里是添加项目
+        addProject(obj).then(() => {
+          this.fetchData();
+          this.dialogFormVisible = false;
+          this.$message({
+            type: "success",
+            message: "添加项目成功!",
+          });
+        });
+      } else {
+        // 这里是编辑修改项目
+        modifyProject(obj.id, obj).then(() => {
+          this.fetchData();
+          this.dialogFormVisible = false;
+          this.$message({
+            type: "success",
+            message: "修改项目成功!",
+          });
+        });
+      }
     },
     handleToGithub(githubAdress) {
-      console.log(`跳转到该项目的github地址${githubAdress}`);
+      // console.log(`跳转到该项目的github地址${githubAdress}`);
+      window.open(githubAdress, "_blank");
     },
   },
   created() {
@@ -192,5 +272,11 @@ export default {
   display: flex;
   justify-content: center;
   padding: 10px;
+}
+.githubIcon {
+  background-color: #d8d8d8;
+  &:hover {
+    background-color: lighten(#d8d8d8, 10%);
+  }
 }
 </style>

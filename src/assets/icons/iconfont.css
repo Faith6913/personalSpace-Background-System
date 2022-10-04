@@ -1,0 +1,26 @@
+@font-face {
+  font-family: "iconfont";
+  /* Project id  */
+  src: url('iconfont.ttf?t=1664881946739') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-style: normal;
+  color: #fff;
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.iconfont:hover {
+  background-color: #fff;
+}
+
+.icon-github:before {
+  content: "\ead8";
+}
+
+.icon-github-fill:before {
+  content: "\e885";
+}
