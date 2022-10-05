@@ -90,3 +90,17 @@ import {
 //     console.log("全部项目：", data);
 //   });
 // });
+
+// 测试一下添加评论接口
+import { getComments, addComment } from "./api/comments";
+addComment({
+  nickname: "号子",
+  content: "看看不带id的返回长啥样",
+  blogId: ""
+}).then((resp) => {
+  console.log(resp);
+});
+
+getComments().then((resp) => {
+  console.log(resp);
+});
