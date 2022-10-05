@@ -1,6 +1,9 @@
 <template>
   <div class="comment-list-container">
     <div class="app-container">
+      <!-- 
+        @filter-change="handleFilterChange" 
+      -->
       <el-table :data="comments" stripe style="width: 100%" border>
         <el-table-column prop="id" label="序号" width="50" align="center">
           <template slot-scope="scope">
@@ -16,7 +19,11 @@
           align="center"
         >
           <template slot-scope="scope">
-            <span style="margin-left: 10px">{{ scope.row.avatar }}</span>
+            <img
+              :src="`${SERVE_URL}${scope.row.avatar}`"
+              alt="avatar"
+              style="width: 50px"
+            />
           </template>
         </el-table-column>
         <el-table-column
@@ -30,12 +37,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column
-          prop="scanNumber"
-          label="评论内容"
-          width="400"
-          align="center"
-        >
+        <el-table-column prop="scanNumber" label="评论内容" align="center">
           <template slot-scope="scope">
             <span style="margin-left: 10px">{{ scope.row.content }}</span>
           </template>
@@ -43,7 +45,7 @@
 
         <el-table-column
           prop="createDate"
-          label="创建日期"
+          label="评论时间"
           width="165"
           align="center"
         >
@@ -53,7 +55,10 @@
             }}</span>
           </template>
         </el-table-column>
-
+        <!-- 
+          :filters="filterArr"
+          :filter-method="filterHandler"
+         -->
         <el-table-column
           prop="blogtype"
           label="所属博客"
@@ -67,23 +72,8 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center">
+        <el-table-column label="删除评论" align="center" width="100">
           <template slot-scope="scope">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="编辑"
-              placement="top"
-              :hide-after="1000"
-            >
-              <el-button
-                type="primary"
-                icon="el-icon-edit"
-                size="mini"
-                circle
-                @click="handleEditBlog(scope.row)"
-              ></el-button>
-            </el-tooltip>
             <el-tooltip
               class="item"
               effect="dark"
@@ -91,7 +81,7 @@
               placement="top"
               :hide-after="1000"
             >
-              <el-button type="text" @click="handleDeleteBlog(scope.row)">
+              <el-button type="text" @click="handleDeleteComment(scope.row)">
                 <el-button
                   type="danger"
                   icon="el-icon-delete"
@@ -109,7 +99,7 @@
         background
         layout="prev, pager, next, ->, sizes, jumper"
         :total="total"
-        :page-sizes="[5, 10, 15, 20, 25]"
+        :page-sizes="[1, 2, 3, 5, 10, 15, 20, 25]"
         :page-size="5"
         @size-change="sizeChangeHandle"
         @current-change="currentChangeHandle"
@@ -122,7 +112,6 @@
 </template>
 
 <script>
-// import { getBlog, deleteBlog } from "@/api/blog";
 import { getComments, addComment, deleteComment } from "@/api/comments";
 import { parseTime } from "@/utils";
 import { SERVE_URL, FRONTED_END_URL } from "@/urlConfig.js";
@@ -134,6 +123,9 @@ export default {
       limit: 5,
       currentPage: 1,
       totalPage: 0,
+      filterArr: [],
+      SERVE_URL: SERVE_URL,
+      // columnKey: null,
     };
   },
   created() {
@@ -143,29 +135,40 @@ export default {
     fetchData() {
       getComments(this.currentPage, this.limit).then(({ data }) => {
         this.comments = data.rows;
-        // for (let i of this.comments) {
-        //   if (i.avatar) {
-        //     i.avatar = SERVE_URL + i.avatar;
-        //   } else {
-        //     i.avatar = "";
-        //   }
-        //   this.srcList.push(i.avatar);
-        // }
         this.total = data.total;
         this.totalPage = Math.ceil(this.total / this.limit);
         // 下面的if判断会在删除博客的时候可能会触发，比如最后一页只有一条数据
         // 删除之后，总页码数就会减一，当前页码就大于了总页码，所以要进行处理
-        // if (this.currentPage > this.totalPage) {
-        //   this.currentPage = this.totalPage;
-        //   this.fetchData();
-        // }
+        if (this.currentPage > this.totalPage) {
+          this.currentPage = this.totalPage;
+          this.fetchData();
+        }
       });
+      this.setFilterArray();
+    },
+    async setFilterArray() {
+      // 每次获取数据之和就调用下该函数，设置筛选数组
+      const resp = await getComments(1, 10000);
+      this.filterArr = [
+        ...new Set(
+          resp.data.rows.map((comment) => {
+            return comment.blog.title;
+          })
+        ),
+      ].map((item) => {
+        return {
+          text: item,
+          value: item,
+        };
+      });
+      console.log(this.filterArr);
     },
     parseCreatedDate(creatDate) {
       return parseTime(creatDate);
     },
     sizeChangeHandle(val) {
       this.limit = val;
+      this.currentPage = 1;
       this.fetchData();
     },
     currentChangeHandle(val) {
@@ -178,19 +181,15 @@ export default {
     nextClickHandle() {
       this.currentPage++;
     },
-    // 删除博客
-    handleDeleteBlog(blogInfo) {
-      this.$confirm(
-        "删除该博客会将该博客下面的评论一并删除, 是否继续?",
-        "是否删除此博客",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-      )
+    // 删除评论
+    handleDeleteComment(commentInfo) {
+      this.$confirm("是否继续删除该评论?", "是否删除此评论", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
         .then(async () => {
-          await deleteBlog(blogInfo.id);
+          await deleteComment(commentInfo.id);
           this.fetchData();
           this.$message({
             type: "success",
@@ -205,13 +204,33 @@ export default {
         });
     },
     // 打开前端文章页面
-    handleOpenTitle(blogInfo) {
-      window.open(`${FRONTED_END_URL}/blog/${blogInfo.id}`);
+    handleOpenTitle(commentInfo) {
+      window.open(`${FRONTED_END_URL}/blog/${commentInfo.id}`);
     },
     // 编辑博客
-    handleEditBlog(blogInfo) {
-      this.$router.push(`/blogEdit/${blogInfo.id}`);
+    handleEditBlog(commentInfo) {
+      this.$router.push(`/blogEdit/${commentInfo.id}`);
     },
+
+    // 筛选分类博客,遇到了问题，未能完成
+    // 如何解决分页与数据同步的问题，筛选与数据分页的问题
+    // 是不是后端接口的问题，如果放到前端又该如何解决。
+    // filterHandler(value, row, column) {
+    //   console.log("column", column);
+    //   this.columnKey = column.id;
+    //   return true;
+    // },
+    // handleFilterChange(obj) {
+    //   console.log("obj:", obj, this.columnKey);
+    //   console.log(obj[this.columnKey]);
+    //   getComments(1, 100000).then(({ data }) => {
+    //     console.log(typeof data, data);
+    //     const newData = data.rows.filter((item) => {
+    //       return item.blog.title === obj[this.columnKey][0];
+    //     });
+    //     this.comments = newData;
+    //   });
+    // },
   },
 };
 </script>
