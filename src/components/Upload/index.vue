@@ -41,7 +41,10 @@ export default {
       }
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg" || file.type === "image/png";
+      const isJPG =
+        file.type === "image/jpeg" ||
+        file.type === "image/png" ||
+        file.type === "image/ico";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
       if (!isJPG) {

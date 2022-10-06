@@ -44,7 +44,7 @@
         />
         <span class="show-pwd" @click="showPwd">
           <svg-icon
-            :icon-class="passwordType === 'loginPwd' ? 'eye' : 'eye-open'"
+            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
           />
         </span>
       </el-form-item>
@@ -134,7 +134,7 @@ export default {
         ],
       },
       loading: false,
-      passwordType: "loginPwd",
+      passwordType: "password",
       redirect: undefined,
     };
   },

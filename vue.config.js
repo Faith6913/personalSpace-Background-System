@@ -44,6 +44,9 @@ module.exports = {
       "/api": {
         target: "http://localhost:7001",
       },
+      "/static": {
+        target: "http://localhost:7001",
+      },
     },
   },
   configureWebpack: {

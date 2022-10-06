@@ -103,6 +103,7 @@ export default {
           this.form.selected = data.category === null ? "" : data.category.name;
           this.form.categoryId = data.category === null ? "" : data.category.id;
           this.$refs.toastuiEditor.invoke("setHTML", data.htmlContent);
+          console.log(this.form);
         });
       }
     },
