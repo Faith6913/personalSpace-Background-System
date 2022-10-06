@@ -191,7 +191,7 @@ export const constantRoutes = [
         name: "personalSetting",
         component: () => import("@/views/personalSetting/index"),
         meta: { title: "个人中心", icon: "", auth: true },
-        hidden: false,
+        hidden: true,
       },
     ],
   },

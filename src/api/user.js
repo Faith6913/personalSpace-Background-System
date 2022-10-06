@@ -14,3 +14,11 @@ export function getInfoAPI() {
     method: "get",
   });
 }
+
+export function setUserAPI(data) {
+  return request({
+    url: "/api/admin",
+    method: "put",
+    data
+  });
+}
