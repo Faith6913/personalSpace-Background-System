@@ -186,11 +186,11 @@ export default {
       getBlog(this.currentPage, this.limit).then(({ data }) => {
         this.blogs = data.rows;
         for (let i of this.blogs) {
-          if (i.thumb) {
-            i.thumb = SERVE_URL + i.thumb;
-          } else {
-            i.thumb = "";
-          }
+          // if (i.thumb) {
+          //   i.thumb = SERVE_URL + i.thumb;
+          // } else {
+          //   i.thumb = "";
+          // }
           this.srcList.push(i.thumb);
         }
         this.total = data.total;

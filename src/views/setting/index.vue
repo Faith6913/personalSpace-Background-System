@@ -132,7 +132,7 @@
 <script>
 import { getSetting, setSetting } from "@/api/setting.js";
 import Upload from "@/components/Upload";
-import { SERVE_URL } from "@/urlConfig.js";
+// import { SERVE_URL } from "@/urlConfig.js";
 export default {
   data() {
     return {

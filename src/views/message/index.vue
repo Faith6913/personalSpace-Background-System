@@ -17,7 +17,7 @@
         >
           <template slot-scope="scope">
             <img
-              :src="`${SERVE_URL}${scope.row.avatar}`"
+              :src="`${scope.row.avatar}`"
               alt="avatar"
               style="width: 50px"
             />
@@ -95,7 +95,7 @@
 <script>
 import { getMessages, deleteMessage } from "@/api/message";
 import { parseTime } from "@/utils";
-import { SERVE_URL, FRONTED_END_URL } from "@/urlConfig.js";
+// import { SERVE_URL, FRONTED_END_URL } from "@/urlConfig.js";
 export default {
   data() {
     return {
@@ -105,7 +105,7 @@ export default {
       currentPage: 1,
       totalPage: 0,
       filterArr: [],
-      SERVE_URL: SERVE_URL,
+      // SERVE_URL: SERVE_URL,
     };
   },
   created() {

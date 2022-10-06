@@ -20,7 +20,7 @@
         >
           <template slot-scope="scope">
             <img
-              :src="`${SERVE_URL}${scope.row.avatar}`"
+              :src="`${scope.row.avatar}`"
               alt="avatar"
               style="width: 50px"
             />

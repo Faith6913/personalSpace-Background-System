@@ -27,7 +27,7 @@
           <template slot-scope="scope">
             <el-image
               style="width: 100px"
-              :src="`${BASE_URL}${scope.row.midImg}`"
+              :src="`${scope.row.midImg}`"
             ></el-image>
           </template>
         </el-table-column>
@@ -35,7 +35,7 @@
           <template slot-scope="scope">
             <el-image
               style="width: 100px"
-              :src="`${BASE_URL}${scope.row.bigImg}`"
+              :src="`${scope.row.bigImg}`"
             ></el-image>
           </template>
         </el-table-column>
@@ -131,7 +131,7 @@
 
 <script>
 import { getBanner, setBanner } from "@/api/banner.js";
-import { SERVE_URL } from "@/urlConfig.js";
+// import { SERVE_URL } from "@/urlConfig.js";
 import Upload from "@/components/Upload";
 export default {
   components: {
@@ -140,7 +140,7 @@ export default {
   data() {
     return {
       data: [],
-      BASE_URL: SERVE_URL,
+      // BASE_URL: SERVE_URL,
       dialogFormVisible: false,
       // 这个form属性是编辑或者新建标语时的内容
       form: {
