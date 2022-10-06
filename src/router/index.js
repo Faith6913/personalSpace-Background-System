@@ -180,6 +180,21 @@ export const constantRoutes = [
       },
     ],
   },
+
+  {
+    path: "/personalSetting",
+    redirect: "/personalSetting",
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "personalSetting",
+        component: () => import("@/views/personalSetting/index"),
+        meta: { title: "个人中心", icon: "", auth: true },
+        hidden: false,
+      },
+    ],
+  },
   // {
   //   path: "/form",
   //   component: Layout,
