@@ -185,6 +185,7 @@ export default {
               this.loading = false;
             })
             .catch((res) => {
+              console.log(res);
               this.$message.error(`${res}`);
               this.getCaptchaFunc();
               this.loading = false;
