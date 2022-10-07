@@ -205,7 +205,7 @@ export default {
       window.open(projectAdress, "_blank");
     },
     handleAddProject() {
-      this.dialogFormVisible = true;
+      this.$router.push("/projectManagement/projectAdd");
     },
     handleDeleteOneProject(projectId) {
       console.log(`删除id为${projectId}的项目`);
