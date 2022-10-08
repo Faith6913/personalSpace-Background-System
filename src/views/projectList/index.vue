@@ -11,7 +11,7 @@
         <el-table-column
           prop="title"
           label="项目名称"
-          width="300"
+          width="260"
           align="center"
         >
           <template slot-scope="scope">
